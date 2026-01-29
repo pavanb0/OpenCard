@@ -3,7 +3,7 @@
 #include "buttons.h"
 #include <hardware/buzzer/buzzer.h>
 
-void button_init()
+void buttonInit()
 {
   pinMode(BTN_UP, INPUT_PULLUP);
   pinMode(BTN_SELECT, INPUT_PULLUP);
