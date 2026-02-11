@@ -13,13 +13,14 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 
 void displayInit()
 {
-    Wire.begin(); // ESP32 default I2C pins are fine unless you changed
+    Wire.begin(); // ESP32 default I2C pins are fine but we need to press boot during boot then reset button
+
 
     if (!display.begin(SSD1306_SWITCHCAPVCC, OLED_ADDR))
     {
         Serial.println("OLED failed");
-        while (1);
         buzzerClick();
+        while (1);
     }
     display.clearDisplay();
     display.setTextSize(1);
@@ -29,6 +30,12 @@ void displayInit()
     display.display();
 }
 
+void writeDisplay(const char* text){
+    display.clearDisplay();
+    display.setCursor(0,0);
+    display.print(text);
+    display.display();
+}
 void clearDisplay(){
 xSemaphoreCreateMutex();
     display.clearDisplay();
