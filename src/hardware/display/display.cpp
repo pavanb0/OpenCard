@@ -30,6 +30,7 @@ void displayInit()
 }
 
 void clearDisplay(){
+xSemaphoreCreateMutex();
     display.clearDisplay();
     display.display();
 }
