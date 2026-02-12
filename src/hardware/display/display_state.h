@@ -8,7 +8,12 @@ typedef enum
     DISPLAY_MENUE_DEFAULT_ERROR,
     DISPLAY_MENUE,
     DISPLAY_HOME,
-    DISPLAY_HOMING
+    DISPLAY_HOMING,
+    DISPLAY_CLEAR,
+    DISPLAY_TEST_UP,
+    DISPLAY_TEST_SELECT,
+    DISPLAY_TEST_DOWN,
+    DISPLAY_TEST_WELCOME,
 } display_States;
 
 extern volatile display_States displayState;

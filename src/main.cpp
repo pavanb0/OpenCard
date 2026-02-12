@@ -8,50 +8,16 @@
 
 TaskHandle_t initTaskHandler = NULL;
 TaskHandle_t buzzerTaskHandler = NULL;
+TaskHandle_t displayTaskHandler = NULL;
+TaskHandle_t buttonTaskHandler = NULL;
 
 void initTask(void *taskParams)
 {
-
   buttonInit();
   displayInit();
-  // i want to flag here that task initialization is done
-  xTaskNotifyGive(initTaskHandler);
+  xTaskNotifyGive(buzzerTaskHandler);
   vTaskDelete(NULL);
-};
-/**
- * @param taskParam
- * // use to give arguments to function
- *
- */
-void buzzerTask(void *taskParams)
-{
-  int melody[] = {
-      NOTE_C4, NOTE_G3, NOTE_G3, NOTE_A3, NOTE_G3, 0, NOTE_B3, NOTE_C4};
-
-  int noteDurations[] = {
-      4, 8, 8, 4, 4, 4, 4, 4};
-  for (;;)
-  {
-
-    for (int thisNote = 0; thisNote < 8; thisNote++)
-    {
-      if (ulTaskNotifyTake(pdTRUE, 0) > 0)
-      {
-        noTone(BUZZER);
-        vTaskDelete(NULL); // stop forever
-      }
-
-      int noteDuration = 1000 / noteDurations[thisNote];
-      tone(BUZZER, melody[thisNote], noteDuration);
-      int pauseBetweenNotes = noteDuration * 1.30;
-      vTaskDelay(pauseBetweenNotes / portTICK_PERIOD_MS);
-      noTone(BUZZER);
-    }
-    // and i want to break the music here when it here
-  }
 }
-
-
 
 void setup()
 {
@@ -63,7 +29,7 @@ void setup()
       "initTask",
       4096,
       NULL,
-      2,
+      5,
       &initTaskHandler,
       1);
 
@@ -74,6 +40,24 @@ void setup()
       NULL,
       2,
       &buzzerTaskHandler,
+      1);
+
+  xTaskCreatePinnedToCore(
+      displayTask,
+      "displayTask",
+      8192,
+      NULL,
+      1,
+      &displayTaskHandler,
+      1);
+
+  xTaskCreatePinnedToCore(
+      buttonTask,
+      "bittonTask",
+      2048,
+      NULL,
+      2,
+      &buttonTaskHandler,
       1);
 
   // xTaskCreatePinnedToCore(
@@ -94,4 +78,5 @@ void loop()
   // delay(200);
   // digitalWrite(BUZZER, LOW);
   // delay(1000);
+  buzzerUpdate();
 }

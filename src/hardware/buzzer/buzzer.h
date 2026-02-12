@@ -9,7 +9,7 @@ void buzzerClick();
 void buzzerSuccess();
 void buzzerError();
 void buzzerStartup();
-
+void buzzerTask(void *taskParams);
 void buzzerUpdate();
 
 

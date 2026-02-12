@@ -17,57 +17,6 @@ static uint8_t animationFrame = 0;
 static uint32_t animationLastUpdate = 0;
 const uint32_t animationInterval = 400;
 
-void displayInit()
-{
-    Wire.begin(); // ESP32 default I2C pins are fine but we need to press boot during boot then reset button
-
-    if (!display.begin(SSD1306_SWITCHCAPVCC, OLED_ADDR))
-    {
-        Serial.println("OLED failed");
-        buzzerClick();
-        while (1)
-            ;
-    }
-    display.clearDisplay();
-    display.setTextColor(SSD1306_WHITE);
-    // display.setTextSize(1);
-    // display.setCursor(0, 0);
-    // display.println("ESP32 Ready");
-    display.display();
-}
-
-void displayTask(void *pvTaskData)
-{
-    const TickType_t frameDelay = 50 / portTICK_PERIOD_MS;
-    for (;;)
-    {
-        switch (displayState)
-        {
-        case DISPLAY_HOME_LOADING:
-            drawLoading();
-            break;
-
-        default:
-            break;
-        }
-        vTaskDelay(frameDelay);
-    }
-}
-
-void writeDisplay(const char *text)
-{
-    display.clearDisplay();
-    display.setCursor(0, 0);
-    display.print(text);
-    display.display();
-}
-
-void clearDisplay()
-{
-    display.clearDisplay();
-    display.display();
-}
-
 void drawLoading()
 {
 
@@ -87,4 +36,74 @@ void drawLoading()
         display.println("Loading..");
 
     display.display();
+}
+
+void displayInit()
+{
+    Wire.begin(); // ESP32 default I2C pins are fine but we need to press boot during boot then reset button
+
+    if (!display.begin(SSD1306_SWITCHCAPVCC, OLED_ADDR))
+    {
+        Serial.println("OLED failed");
+        buzzerClick();
+        while (1)
+            ;
+    }
+    display.clearDisplay();
+    display.setTextColor(SSD1306_WHITE);
+    // display.setTextSize(1);
+    // display.setCursor(0, 0);
+    // display.println("ESP32 Ready");
+    display.display();
+}
+
+void writeDisplay(const char *text)
+{
+    display.clearDisplay();
+    display.setCursor(0, 0);
+    display.print(text);
+    display.display();
+}
+
+void clearDisplay()
+{
+    display.clearDisplay();
+    display.display();
+}
+
+void displayTask(void *pvTaskData)
+{
+    const TickType_t frameDelay = 50 / portTICK_PERIOD_MS;
+    for (;;)
+    {
+        switch (displayState)
+        {
+        case DISPLAY_HOME_LOADING:
+            drawLoading();
+            break;
+
+        case DISPLAY_CLEAR:
+            clearDisplay();
+            break;
+
+        case DISPLAY_TEST_UP:
+            writeDisplay("upPressed");
+            break;
+
+        case DISPLAY_TEST_SELECT:
+            writeDisplay("selectPressed");
+            break;
+
+        case DISPLAY_TEST_DOWN:
+            writeDisplay("downPressed");
+            break;
+        case DISPLAY_TEST_WELCOME:
+            writeDisplay("WELCOME TO OPENCARD");
+            break;
+
+        default:
+            break;
+        }
+        vTaskDelay(frameDelay);
+    }
 }
