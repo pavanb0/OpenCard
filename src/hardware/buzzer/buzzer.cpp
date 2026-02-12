@@ -10,23 +10,26 @@ static bool active = false;
 
 void buzzerInit(uint8_t pin){
     // pinMode(BUZZER, OUTPUT);
-    buzzerPin = pin;
-    ledcSetup(pwmChannel, 2000, 8);   
-    ledcAttachPin(buzzerPin, pwmChannel);
-    ledcWrite(pwmChannel, 0); 
+    // buzzerPin = pin;
+    // ledcSetup(pwmChannel, 2000, 8);   
+    // ledcAttachPin(buzzerPin, pwmChannel);
+    // ledcWrite(pwmChannel, 0); 
+
+    noTone(pin);
 }
 
 
 void buzzerTone(uint16_t freq, uint16_t durationMs) {
-    ledcWriteTone(pwmChannel, freq);
-    ledcWrite(pwmChannel, 255);       // 100% duty
+    // ledcWriteTone(pwmChannel, freq);
+    // ledcWrite(pwmChannel, 255);       // 100% duty
+    tone(BUZZER,NOTE_A3);
     active = true;
     offTime = millis() + durationMs;
 }
 
 void buzzerUpdate() {
     if (active && millis() > offTime) {
-        ledcWrite(pwmChannel, 0);
+        noTone(BUZZER);
         active = false;
     }
 }

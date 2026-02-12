@@ -51,6 +51,8 @@ void buzzerTask(void *taskParams)
   }
 }
 
+
+
 void setup()
 {
   Serial.begin(115200);
@@ -73,6 +75,10 @@ void setup()
       2,
       &buzzerTaskHandler,
       1);
+
+  // xTaskCreatePinnedToCore(
+  //   motorTask
+  // )
 }
 
 // void loop()
