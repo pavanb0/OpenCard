@@ -10,7 +10,7 @@
 volatile motor_State motorState = MOTOR_IDLE;
 static u_int8_t duty = 0;
 
-void initMotor()
+void motorInit()
 {
     ledcSetup(PWM_CHANNEL, PWM_FREQ, PWM_RES);
     ledcAttachPin(CARD_MOTOR, PWM_CHANNEL);
@@ -26,10 +26,10 @@ void motorTask(void *taskParameter)
     {
         switch (motorState)
         {
-        case MOTOR_IDLE:
+        // case MOTOR_IDLE:
 
-            stopMotor();
-            break;
+        //  //   stopMotor();
+        //     break;
 
         case MOTOR_SOFT_START:
             if (duty < PWM_MAX)

@@ -1,6 +1,6 @@
 #include <cstdint>
 #ifndef MOTOR_H
-void initMotor();
+void motorInit();
 void setMotorDuty(uint8_t pwm);
 void stopMotor();
 void motorTask(void *taskParameter);
