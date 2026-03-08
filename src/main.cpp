@@ -6,6 +6,8 @@
 #include "hardware/motor/motor.h"
 #include "../src/config/pinmap.h"
 #include "hardware/display/display.h"
+#include "hardware/servo/servo.h"
+#include "hardware/ldr/ldr.h"
 
 TaskHandle_t initTaskHandler = NULL;
 TaskHandle_t buzzerTaskHandler = NULL;
@@ -18,6 +20,8 @@ void initTask(void *taskParams)
   buttonInit();
   displayInit();
   motorInit();
+  servoInit();
+  ldrInit();
   xTaskNotifyGive(buzzerTaskHandler);
   vTaskDelete(NULL);
 }
@@ -90,4 +94,6 @@ void loop()
   // digitalWrite(BUZZER, LOW);
   // delay(1000);
   buzzerUpdate();
+  ldrTask();
+  
 }

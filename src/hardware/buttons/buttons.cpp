@@ -5,6 +5,7 @@
 #include <hardware/display/display.h>
 #include "hardware/display/display_state.h"
 #include "hardware/motor/motor_state.h"
+#include "hardware/servo/servo.h"
 
 void buttonInit()
 {
@@ -41,6 +42,7 @@ void buttonTask(void *pvButtonParams)
             Serial.println("UpPressed & motor SOFT START");
             displayState = DISPLAY_TEST_UP;
             motorState = MOTOR_SOFT_START;
+            moveServo(0);
             buzzerClick();
         }
 
@@ -49,7 +51,7 @@ void buttonTask(void *pvButtonParams)
             Serial.println("SelectPressed & motor SOFT STOP");
             displayState = DISPLAY_TEST_SELECT;
             motorState = MOTOR_SOFT_STOP;
-
+            moveServo(90);
             buzzerClick();
         }
 
@@ -57,7 +59,7 @@ void buttonTask(void *pvButtonParams)
         {
             Serial.println("DownPressed");
             displayState = DISPLAY_TEST_DOWN;
-
+            moveServo(180);
             buzzerClick();
         }
 
