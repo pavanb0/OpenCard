@@ -11,7 +11,7 @@ void servoInit() {
     mcpwm_gpio_init(MCPWM_UNIT_0, MCPWM0A, SERVO_PIN);
 
     mcpwm_config_t pwm_config;
-    pwm_config.frequency = 50;    // Servo = 50Hz
+    pwm_config.frequency = 50;    
     pwm_config.cmpr_a = 0;
     pwm_config.cmpr_b = 0;
     pwm_config.counter_mode = MCPWM_UP_COUNTER;
@@ -21,7 +21,6 @@ void servoInit() {
 }
 
 void moveServo(int angle) {
-    // 0° = 0.5ms, 180° = 2.5ms
     float duty = (angle * 2.0 / 180.0) + 0.5;
     mcpwm_set_duty_in_us(
         MCPWM_UNIT_0,

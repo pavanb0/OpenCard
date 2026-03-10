@@ -1,11 +1,11 @@
 #include <Arduino.h>
 #include "../src/config/pinmap.h"
 #include "buttons.h"
-#include <hardware/buzzer/buzzer.h>
-#include <hardware/display/display.h>
-#include "hardware/display/display_state.h"
-#include "hardware/motor/motor_state.h"
-#include "hardware/servo/servo.h"
+#include <hardware_drivers/buzzer/buzzer.h>
+#include <hardware_drivers/display/display.h>
+#include "hardware_drivers/display/display_state.h"
+#include "hardware_drivers/motor/motor_state.h"
+#include "hardware_drivers/servo/servo.h"
 
 void buttonInit()
 {

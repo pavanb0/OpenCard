@@ -1,13 +1,14 @@
 
 #include <Arduino.h>
-#include "../src/hardware/buttons/buttons.h"
-#include "hardware/buzzer/buzzer.h"
-#include "hardware/buttons/buttons.h"
-#include "hardware/motor/motor.h"
+#include "../src/hardware_drivers/buttons/buttons.h"
+#include "hardware_drivers/buzzer/buzzer.h"
+#include "hardware_drivers/buttons/buttons.h"
+#include "hardware_drivers/motor/motor.h"
 #include "../src/config/pinmap.h"
-#include "hardware/display/display.h"
-#include "hardware/servo/servo.h"
-#include "hardware/ldr/ldr.h"
+#include "hardware_drivers/display/display.h"
+#include "hardware_drivers/servo/servo.h"
+#include "hardware_drivers/ldr/ldr.h"
+#include "tasks/buzzer_task.h"
 
 TaskHandle_t initTaskHandler = NULL;
 TaskHandle_t buzzerTaskHandler = NULL;

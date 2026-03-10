@@ -1,7 +1,7 @@
 #include "Arduino.h"
 #include <config/pinmap.h>
 #include "ldr_state.h"
-#include <hardware/buzzer/buzzer.h>
+#include <hardware_drivers/buzzer/buzzer.h>
 
 volatile ldr_state ldrState = {false, false};
 
@@ -36,7 +36,7 @@ void ldrTask()
         Serial.println(ldrState.gantryClear);
 
         if(ldrState.gantryClear){
-            buzzerTone(1000,500);
+            buzzerTone(220,500);
         }
     }
 }

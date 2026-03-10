@@ -5,7 +5,7 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 #include "../src/config/pinmap.h"
-#include <hardware/buzzer/buzzer.h>
+#include <hardware_drivers/buzzer/buzzer.h>
 #include "display_state.h"
 #define SCREEN_ADDRESS 0x3C
 #define OLED_ADDR 0x3C
