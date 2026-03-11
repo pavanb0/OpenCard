@@ -9,12 +9,16 @@
 #include "hardware_drivers/servo/servo.h"
 #include "hardware_drivers/ldr/ldr.h"
 #include "tasks/buzzer_task.h"
+#include <modules/card_throw.h>
+#include <system/card_controller.h>
 
 TaskHandle_t initTaskHandler = NULL;
 TaskHandle_t buzzerTaskHandler = NULL;
 TaskHandle_t displayTaskHandler = NULL;
 TaskHandle_t buttonTaskHandler = NULL;
 TaskHandle_t motorTaskHandler = NULL;
+TaskHandle_t cardThrowTaskHandler = NULL;
+TaskHandle_t gameControllerTaskHandler = NULL;
 
 void initTask(void *taskParams)
 {
@@ -68,6 +72,25 @@ void setup()
       &buttonTaskHandler,
       1);
 
+  xTaskCreatePinnedToCore(
+    throwCardTask,
+    "cardThrowTask",
+    2048,
+    NULL,
+    2,
+    &cardThrowTaskHandler,
+    1
+  );
+  xTaskCreatePinnedToCore(
+    gameControllerTask,
+    "gameController",
+    2048,
+    NULL,
+    2,
+    &gameControllerTaskHandler,
+    1
+  );
+
 //   xTaskCreatePinnedToCore(
 //       motorTask,
 //       "motor",
@@ -95,6 +118,6 @@ void loop()
   // digitalWrite(BUZZER, LOW);
   // delay(1000);
   buzzerUpdate();
-  ldrTask();
+  //ldrTask();
   
 }

@@ -18,7 +18,7 @@ void servoInit() {
     pwm_config.duty_mode = MCPWM_DUTY_MODE_0;
 
     mcpwm_init(MCPWM_UNIT_0, MCPWM_TIMER_0, &pwm_config);
-    moveServo(0);
+    // moveServo(0);
 }
 
 void moveServo(int angle) {
