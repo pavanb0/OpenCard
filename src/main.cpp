@@ -68,14 +68,14 @@ void setup()
       &buttonTaskHandler,
       1);
 
-  xTaskCreatePinnedToCore(
-      motorTask,
-      "motor",
-      4096,
-      NULL,
-      2,
-      &motorTaskHandler,
-      2);
+//   xTaskCreatePinnedToCore(
+//       motorTask,
+//       "motor",
+//       4096,
+//       NULL,
+//       2,
+//       &motorTaskHandler,
+//       2);
   // xTaskCreatePinnedToCore(
   //   motorTask
   // )

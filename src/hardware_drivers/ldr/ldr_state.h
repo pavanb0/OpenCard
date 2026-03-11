@@ -9,5 +9,7 @@ typedef struct {
 } ldr_state;
 
 extern volatile ldr_state ldrState;
+extern volatile long gantryLdrFallDetect; // detects fall which means card in it record the time
+extern volatile long gantryLdrFallRemovedDetected; // fall is removed from the ldr its high again record both times
 
 #endif

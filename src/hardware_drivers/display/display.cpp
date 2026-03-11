@@ -71,6 +71,8 @@ void clearDisplay()
     display.display();
 }
 
+
+
 void displayTask(void *pvTaskData)
 {
     const TickType_t frameDelay = 50 / portTICK_PERIOD_MS;

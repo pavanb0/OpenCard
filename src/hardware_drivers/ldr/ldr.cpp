@@ -5,9 +5,18 @@
 
 volatile ldr_state ldrState = {false, false};
 
+// void IRAM_ATTR gantryISR()
+// {
+//     if(!digitalRead(GANTRY_LDR)){
+//         ldrState.gantryClear = true;
+//     }else{
+//         ldrState.gantryClear = false;
+//     }
+
+// }
 void IRAM_ATTR gantryISR()
 {
-    if(!digitalRead(GANTRY_LDR)){
+    if(digitalRead(GANTRY_LDR)){
         ldrState.gantryClear = true;
     }else{
         ldrState.gantryClear = false;
@@ -20,6 +29,10 @@ void ldrInit()
     pinMode(GANTRY_LDR, INPUT_PULLDOWN);
     attachInterrupt(digitalPinToInterrupt(GANTRY_LDR), gantryISR, CHANGE);
 }
+
+bool isGantryClear(){
+    return ldrState.gantryClear;
+} 
 
 
 unsigned long readDelay = 500;
@@ -39,6 +52,10 @@ void ldrTask()
             buzzerTone(220,500);
         }
     }
+}
+
+bool isStackEmpty(){
+    return false;
 }
 
 void testLdr()
