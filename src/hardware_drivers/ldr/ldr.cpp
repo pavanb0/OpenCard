@@ -31,7 +31,8 @@ void ldrInit()
 }
 
 bool isGantryClear(){
-    return ldrState.gantryClear;
+    // return ldrState.gantryClear;
+    return digitalRead(GANTRY_LDR);
 } 
 
 

@@ -5,7 +5,7 @@
 #define BUZZER_PWM_CHANNEL 4
 #define BUZZER_PWM_FREQ 2000
 #define BUZZER_PWM_RES 8
-#define BUZZER_DUTY 128 * 0.3
+#define BUZZER_DUTY 128 
 
 static uint8_t buzzerPin;
 static uint8_t pwmChannel = 0;

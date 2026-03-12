@@ -63,19 +63,19 @@
 #include <modules/card_throw_state.h>
 #include <hardware_drivers/stepper/stepper.h>
 
-static int player = 4;
-static int cards_per_player = 5;
+static int player = 2;
+static int cards_per_player = 3;
 
-void startGame(int players, int cards_per_player)
+void startGame(int players, int cardsPerPlayer)
 {
-    Serial.println("startGame() called");
-    Serial.print("Players: ");
-    Serial.println(players);
-    Serial.print("Cards per player: ");
-    Serial.println(cards_per_player);
+   // Serial.println("startGame() called");
+    // Serial.print("Players: ");
+    // Serial.println(players);
+    // Serial.print("Cards per player: ");
+    // Serial.println(cardsPerPlayer);
 
     player = players;
-    cards_per_player = cards_per_player;
+    cards_per_player = cardsPerPlayer;
 };
 
 void gameControllerTask(void *pvArguments)
@@ -98,26 +98,26 @@ void gameControllerTask(void *pvArguments)
 
             for (uint16_t circleCount = 0; circleCount < cards_per_player; circleCount++)
             {
-                Serial.print("Outer circle iteration: ");
+                // Serial.print("Outer circle iteration: ");
                 Serial.println(circleCount);
 
                 if (getCardThrowState() == STATE_CARD_JAMMED)
                 {
-                    Serial.println("Jam detected. Breaking outer loop.");
+                    // Serial.println("Jam detected. Breaking outer loop.");
                     break;
                 }
 
-                Serial.println("outer Circle ");
+                // Serial.println("outer Circle ");
 
                 for (u_int16_t playerRotate = 0; playerRotate < player; playerRotate++)
                 {
-                    Serial.print("Dealing to player index: ");
+                    // Serial.print("Dealing to player index: ");
                     Serial.println(playerRotate);
 
                     setCardThrowState(STATE_RUNNING);
                     Serial.println("State set to STATE_RUNNING");
 
-                    vTaskDelay(3300 / portTICK_PERIOD_MS);
+                    vTaskDelay(5500 / portTICK_PERIOD_MS); // servo(1000) + ramp(~510) + gantry wait(up to 3000) = ~4500ms, 5500 gives margin
 
                     Serial.print("Card throw state after delay: ");
                     Serial.println(getCardThrowState());
