@@ -63,14 +63,14 @@ void setup()
       &displayTaskHandler,
       1);
 
-  xTaskCreatePinnedToCore(
-      buttonTask,
-      "bittonTask",
-      2048,
-      NULL,
-      2,
-      &buttonTaskHandler,
-      1);
+  // xTaskCreatePinnedToCore(
+  //     buttonTask,
+  //     "bittonTask",
+  //     2048,
+  //     NULL,
+  //     2,
+  //     &buttonTaskHandler,
+  //     1);
 
   xTaskCreatePinnedToCore(
     throwCardTask,

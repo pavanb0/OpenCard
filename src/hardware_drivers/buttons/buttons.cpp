@@ -6,102 +6,37 @@
 #include "hardware_drivers/display/display_state.h"
 #include "hardware_drivers/motor/motor_state.h"
 #include "hardware_drivers/servo/servo.h"
+#include "buttons.h"
+
+#define LONG_PRESS_MS 800
+
+struct Btn
+{
+  uint8_t pin;
+  bool lastState;
+  uint32_t pressedAt;
+  bool longSent;
+};
+
+static Btn btn[3];
 
 void buttonInit()
 {
-    pinMode(BTN_UP, INPUT_PULLUP);
-    pinMode(BTN_SELECT, INPUT_PULLUP);
-    pinMode(BTN_DOWN, INPUT_PULLUP);
+  btn[STATE_BTN_UP] = {BTN_UP, HIGH, 0, false};
+  btn[STATE_BTN_SELECT] = {BTN_SELECT, HIGH, 0, false};
+  btn[STATE_BTN_DOWN] = {BTN_DOWN, HIGH, 0, false};
+
+  for (auto &b : btn)
+  {
+    pinMode(b.pin, INPUT_PULLUP);
+  }
+  // pinMode(STATE_BTN_UP, INPUT_PULLUP);
+  // pinMode(BTN_SELECT, INPUT_PULLUP);
+  // pinMode(BTN_DOWN, INPUT_PULLUP);
 }
 
-void buttonTask(void *pvButtonParams)
+bool buttonShortPress(ButtonState b)
 {
-    const TickType_t buttonDelay = 30 / portTICK_PERIOD_MS;
-
-    bool upPrev = HIGH;
-    bool selectPrev = HIGH;
-    bool downPrev = HIGH;
-
-    for (;;)
-    {
-        bool upNow = digitalRead(BTN_UP);
-        bool selectNow = digitalRead(BTN_SELECT);
-        bool downNow = digitalRead(BTN_DOWN);
-
-        // edge detection
-        /**
-         * think like this we initiali set up prev as high
-         * and when button pressed upNow becomes low because button pulls it low
-         * and in this loop up now and up prev become true and we enter in the block
-         * and when we dont leave the button and its still low then then upPrev is low
-         * and we dont go inside and as we set it it becomse high again and it resets
-         * so we prevent continues click with this method
-         */
-        if (upPrev == HIGH && upNow == LOW)
-        {
-            Serial.println("UpPressed & motor SOFT START");
-            displayState = DISPLAY_TEST_UP;
-            motorState = MOTOR_SOFT_START;
-            moveServo(0);
-            buzzerClick();
-        }
-
-        if (selectPrev == HIGH && selectNow == LOW)
-        {
-            Serial.println("SelectPressed & motor SOFT STOP");
-            displayState = DISPLAY_TEST_SELECT;
-            motorState = MOTOR_SOFT_STOP;
-            moveServo(90);
-            buzzerClick();
-        }
-
-        if (downPrev == HIGH && downNow == LOW)
-        {
-            Serial.println("DownPressed");
-            displayState = DISPLAY_TEST_DOWN;
-            moveServo(180);
-            buzzerClick();
-        }
-
-        upPrev = upNow;
-        selectPrev = selectNow;
-        downPrev = downNow;
-
-        vTaskDelay(buttonDelay);
-    }
+  Btn &bt = btn[b];
+  bool cur = digitalRead(bt.pin);
 }
-
-// void buttonTask(void *pvButtonParams)
-// {
-//     const TickType_t buttonDelay = 300 / portTICK_PERIOD_MS;
-//     for (;;)
-//     {
-//         bool upNow = digitalRead(BTN_UP);
-//         bool selectNow = digitalRead(BTN_SELECT);
-//         bool downNow = digitalRead(BTN_DOWN);
-
-//         if (upNow == HIGH)
-//         {
-//           //0.  displayState = DISPLAY_TEST_UP;
-//            // buzzerClick();
-//            Serial.write("UpPressed \n");
-//            vTaskDelay(buttonDelay);
-//         }
-
-//         if (selectNow == HIGH)
-//         {
-//             //  displayState = DISPLAY_TEST_SELECT;
-//             //   buzzerClick();
-//             Serial.write("SelectPressed \n");
-//             vTaskDelay(buttonDelay);
-//         }
-
-//         if (downNow == HIGH)
-//         {
-//             // displayState = DISPLAY_TEST_DOWN;
-//             //  buzzerClick();
-//             Serial.write("DownPressed \n");
-//             vTaskDelay(buttonDelay);
-//         }
-//     }
-// }
