@@ -11,6 +11,7 @@
 #include "tasks/buzzer_task.h"
 #include <modules/card_throw.h>
 #include <system/card_controller.h>
+#include <modules/card_throw_queue.h>
 
 TaskHandle_t initTaskHandler = NULL;
 TaskHandle_t buzzerTaskHandler = NULL;
@@ -27,6 +28,7 @@ void initTask(void *taskParams)
   motorInit();
   servoInit();
   ldrInit();
+  initThrowQueues();
   xTaskNotifyGive(buzzerTaskHandler);
   vTaskDelete(NULL);
 }

@@ -14,9 +14,9 @@ typedef enum {
 
 extern volatile card_throw_sates cardThrowState;
 
-void setCardThrowState(card_throw_sates state);
+// void setCardThrowState(card_throw_sates state);
 
 
-card_throw_sates getCardThrowState();
+// card_throw_sates getCardThrowState();
 
 #endif
