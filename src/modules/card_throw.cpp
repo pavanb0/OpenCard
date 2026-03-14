@@ -321,9 +321,29 @@ void throwCardTask(void *pvArgs)
             {
             case CMD_CARD_THROW:
             {
+                moveServo(0);
+                vTaskDelay(800 / portTICK_PERIOD_MS);
                 ThrowResult throwRes = RESULT_SUCCESS;
-                Serial.println("in throw task waiting 2 second simulating succes card throw");
-                vTaskDelay(2000 / portTICK_PERIOD_MS);
+                for (u_int16_t i = 0; i < MOTOR_PWM_MAX; i += MOTOR_PWM_SOFT_STEP_COUNT)
+                { // motor will ramp up in 17 steps slow to full speed in 17 * 30 ms
+                    Serial.print("Motor PWM duty: ");
+                    Serial.println(i);
+                    Serial.println(isGantryClear() ? "GANTRY CLEAR" : "GANTRY BLOCKED");
+                    setMotorDuty(i);
+                    vTaskDelay(30 / portTICK_PERIOD_MS);
+                }
+                setMotorDuty(255);
+                vTaskDelay(1500/portTICK_RATE_MS);
+                stopMotor();
+                moveServo(180);
+                vTaskDelay(800/portTICK_RATE_MS);
+
+                // vTaskDelay(5000 / portTICK_PERIOD_MS);
+                // moveServo(0); // this throw card forward 0 deg 180 pulls it back
+                // vTaskDelay(5000 / portTICK_PERIOD_MS);
+                // Serial.println("in 5 sec servo moving 180 degree");
+                // vTaskDelay(2000 / portTICK_PERIOD_MS);
+
                 xQueueSend(throwResultQueue, &throwRes, portMAX_DELAY);
                 break;
             }

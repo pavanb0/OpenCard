@@ -12,6 +12,7 @@
 #include <modules/card_throw.h>
 #include <system/card_controller.h>
 #include <modules/card_throw_queue.h>
+#include "hardware_drivers/stepper/stepper.h"
 
 TaskHandle_t initTaskHandler = NULL;
 TaskHandle_t buzzerTaskHandler = NULL;
@@ -29,6 +30,7 @@ void initTask(void *taskParams)
   servoInit();
   ldrInit();
   initThrowQueues();
+  stepperInit();
   xTaskNotifyGive(buzzerTaskHandler);
   vTaskDelete(NULL);
 }

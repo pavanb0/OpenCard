@@ -3,18 +3,24 @@
 #include "../src/config/pinmap.h"
 #include <Stepper.h>
  
-const float GEAR_RED = 64;
-const float STEPS_PER_REV = 32; 
-const float STEPS_PER_OUT_REV = STEPS_PER_REV * GEAR_RED;
-Stepper turretStepper(STEPS_PER_OUT_REV,STEPPER_L1,STEPPER_L2,STEPPER_L3,STEPPER_L4);
 
+const int STEPS_PER_REV = 2048;
+Stepper turretStepper(STEPS_PER_REV, STEPPER_L1, STEPPER_L3, STEPPER_L2, STEPPER_L4);
+
+void stepperRelease() {
+  digitalWrite(STEPPER_L1, LOW);
+  digitalWrite(STEPPER_L2, LOW);
+  digitalWrite(STEPPER_L3, LOW);
+  digitalWrite(STEPPER_L4, LOW);
+}
 
 void stepperInit(){
-  turretStepper.setSpeed(100);   
+  turretStepper.setSpeed(15);   
     //TODO add homing logic 
 }
 void stepperMove(int angle){ //give 0-360 angle and move accordingly
-    turretStepper.step((STEPS_PER_OUT_REV / 360 ) * angle);
+    turretStepper.step(( STEPS_PER_REV / 360 ) * angle);
+    stepperRelease();
 }
 void turretHoming(){ 
     // TODO implement it here in future first dcmotor need to spin
