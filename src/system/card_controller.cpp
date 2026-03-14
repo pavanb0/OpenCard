@@ -157,65 +157,88 @@
 #include <modules/card_throw_state.h>
 #include <hardware_drivers/stepper/stepper.h>
 #include <modules/card_throw_queue.h>
+#include "card_controller_queue.h"
 
-static int player = 2;
-static int cards_per_player = 3;
 volatile bool isDeckEmpty = false;
-
-void startGame(int players, int cardsPerPlayer)
-{
-    player = players;
-    cards_per_player = cardsPerPlayer;
-    isDeckEmpty = false;
-
-};
-
 
 void gameControllerTask(void *pvArguments)
 {
     Serial.println("Game Controller Task Started");
-    int angle = 360 / player;
     for (;;)
     {
         Serial.println("Game Controller Task loop");
-
-        for (int rounds = 0; rounds < cards_per_player && !isDeckEmpty; rounds++)
+        CardControllerRequest throwControllerRequest;
+        if (xQueueReceive(cardControllerRequest, &throwControllerRequest, portMAX_DELAY) == pdTRUE)
         {
-            for (int p = 0; p < player && !isDeckEmpty; p++)
+            isDeckEmpty = false;
+            int angle = 360 / throwControllerRequest.playerCount;
+
+            CardControllerResponse throwCardControllerResponse;
+            for (int rounds = 0; rounds < throwControllerRequest.cardsPerPlayer && !isDeckEmpty && throwControllerRequest.isSendTask; rounds++)
             {
-                ThrowCommand command = CMD_CARD_THROW;
-                xQueueSend(throwCommandQueue, &command, portMAX_DELAY);
-                ThrowResult result;
-                if (xQueueReceive(throwResultQueue, &result, portMAX_DELAY))
+                throwCardControllerResponse.currentCard = rounds + 1;
+
+                for (int p = 0; p < throwControllerRequest.playerCount && !isDeckEmpty; p++)
                 {
-                    Serial.println(uxQueueMessagesWaiting(throwResultQueue));
+                    throwCardControllerResponse.currentPlayer = p + 1;
 
-                    switch (result)
+                    ThrowCommand command = CMD_CARD_THROW;
+                    xQueueSend(throwCommandQueue, &command, portMAX_DELAY);
+                    ThrowResult result;
+                    if (xQueueReceive(throwResultQueue, &result, portMAX_DELAY))
                     {
-                    case RESULT_SUCCESS:
-                        Serial.println("one card throwed succesfully");
-                        stepperMove(angle);
-                        break;
-                    case RESULT_EMPTY:
-                        /* code */
-                        isDeckEmpty = true;
-                        Serial.println("Stack is empty");
+                        // Serial.println(uxQueueMessagesWaiting(throwResultQueue));
 
-                        break;
-                    case RESULT_JAM:
-                        /* code */
-                        while (true)
+                        throwCardControllerResponse.totalPlayers = throwControllerRequest.playerCount;
+                        throwCardControllerResponse.cardsPerPlayer = throwControllerRequest.cardsPerPlayer;
+                        throwCardControllerResponse.deckEmpty = false;
+                        throwCardControllerResponse.jamDetected = false;
+                        throwCardControllerResponse.finished = false;
+                        switch (result)
                         {
-                            vTaskDelay(1000 / portTICK_PERIOD_MS);
-                            Serial.println("controller HALTED Card jammed");
-                        } // TODO later will add in menue to handle this
-                        break;
+                        
+                            case RESULT_SUCCESS:
+                        {
 
-                    default:
-                        break;
+                            Serial.println("one card throwed succesfully");
+                            stepperMove(angle);
+                            break;
+                        }
+                        case RESULT_EMPTY:
+                        {
+                            throwCardControllerResponse.deckEmpty = true;
+
+                            /* code */
+                            isDeckEmpty = true;
+                            Serial.println("Stack is empty");
+
+                            break;
+                        }
+                        case RESULT_JAM:
+                        {
+                            throwCardControllerResponse.jamDetected = true;
+                            xQueueSend(cardControllerResponse, &throwCardControllerResponse, portMAX_DELAY);
+
+                            /* code */
+                            while (true)
+                            {
+                                vTaskDelay(1000 / portTICK_PERIOD_MS);
+                                Serial.println("controller HALTED Card jammed");
+                            } // TODO later will add in menue to handle this
+                            break;
+                        }
+
+                        default:
+                        {
+                            break;
+                        }
+                        }
+                        xQueueSend(cardControllerResponse, &throwCardControllerResponse, portMAX_DELAY);
                     }
                 }
             }
+            throwCardControllerResponse.finished = true;
+            xQueueSend(cardControllerResponse, &throwCardControllerResponse, portMAX_DELAY);
         }
 
         vTaskDelay(300 / portTICK_PERIOD_MS);
