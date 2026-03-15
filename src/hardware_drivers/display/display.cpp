@@ -7,6 +7,8 @@
 #include "../src/config/pinmap.h"
 #include <hardware_drivers/buzzer/buzzer.h>
 #include "display_state.h"
+#include <hardware_drivers/buttons/buttons.h>
+#include <ui/ui_menue.h>
 #define SCREEN_ADDRESS 0x3C
 #define OLED_ADDR 0x3C
 
@@ -51,6 +53,7 @@ void displayInit()
     }
     display.clearDisplay();
     display.setTextColor(SSD1306_WHITE);
+    menuInit();
     // display.setTextSize(1);
     // display.setCursor(0, 0);
     // display.println("ESP32 Ready");
@@ -71,41 +74,14 @@ void clearDisplay()
     display.display();
 }
 
-
-
 void displayTask(void *pvTaskData)
 {
     const TickType_t frameDelay = 50 / portTICK_PERIOD_MS;
     for (;;)
     {
-        switch (displayState)
-        {
-        case DISPLAY_HOME_LOADING:
-            drawLoading();
-            break;
+        menuUpdate();
+        menuDraw();
 
-        case DISPLAY_CLEAR:
-            clearDisplay();
-            break;
-
-        case DISPLAY_TEST_UP:
-            writeDisplay("upPressed");
-            break;
-
-        case DISPLAY_TEST_SELECT:
-            writeDisplay("selectPressed");
-            break;
-
-        case DISPLAY_TEST_DOWN:
-            writeDisplay("downPressed");
-            break;
-        case DISPLAY_TEST_WELCOME:
-            writeDisplay("WELCOME TO OPENCARD");
-            break;
-
-        default:
-            break;
-        }
         vTaskDelay(frameDelay);
     }
 }

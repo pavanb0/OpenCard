@@ -33,14 +33,14 @@ void initTask(void *taskParams)
   servoInit();
   ldrInit();
   stepperInit();
+  buzzerInit(BUZZER);
   xTaskNotifyGive(buzzerTaskHandler);
-  vTaskDelete(NULL);
+  vTaskDelete(NULL);  
 }
 
 void setup()
 {
   Serial.begin(115200);
-  buzzerInit(BUZZER);
 
   xTaskCreatePinnedToCore(
       initTask,
@@ -69,14 +69,6 @@ void setup()
       &displayTaskHandler,
       1);
 
-  // xTaskCreatePinnedToCore(
-  //     buttonTask,
-  //     "bittonTask",
-  //     2048,
-  //     NULL,
-  //     2,
-  //     &buttonTaskHandler,
-  //     1);
 
   xTaskCreatePinnedToCore(
     throwCardTask,
@@ -97,25 +89,10 @@ void setup()
     1
   );
 
-//   xTaskCreatePinnedToCore(
-//       motorTask,
-//       "motor",
-//       4096,
-//       NULL,
-//       2,
-//       &motorTaskHandler,
-//       2);
-  // xTaskCreatePinnedToCore(
-  //   motorTask
-  // )
+
 }
 
-// void loop()
-// {
-//     buzzerUpdate();
-//     button_print();
-//     // Serial.println(millis());
-// }
+
 
 void loop()
 {
@@ -123,7 +100,24 @@ void loop()
   // delay(200);
   // digitalWrite(BUZZER, LOW);
   // delay(1000);
-  buzzerUpdate();
+  // buzzerUpdate();
   //ldrTask();
   
 }
+
+
+// #define BUZZER 17
+// #include "Arduino.h"
+// void setup()
+// {
+//   ledcSetup(4, 2000, 8);
+//   ledcAttachPin(BUZZER, 4);
+// }
+
+// void loop()
+// {
+//   ledcWrite(4, 128);
+//   delay(200);
+//   ledcWrite(4, 0);
+//   delay(800);
+// }

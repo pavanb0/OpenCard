@@ -11,7 +11,7 @@ void buzzerError();
 void buzzerStartup();
 // void buzzerTask(void *taskParams);
 void buzzerUpdate();
-
+void buzzerDoubleClick();
 
 /*************************************************
  * Public Constants

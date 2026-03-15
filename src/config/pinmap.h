@@ -4,7 +4,7 @@
 #define BTN_UP 14
 #define BTN_SELECT 18
 #define BTN_DOWN 19
-#define BUZZER 23
+#define BUZZER 17
 #define GANTRY_LDR 35
 #define STACK_LDR 36
 #define SG90_SERVO 13

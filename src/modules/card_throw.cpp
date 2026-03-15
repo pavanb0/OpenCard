@@ -337,7 +337,8 @@ void throwCardTask(void *pvArgs)
                 stopMotor();
                 moveServo(180);
                 vTaskDelay(800/portTICK_RATE_MS);
-
+                //TODO currently skipping jamming complexity and stack empty complexity
+                
                 // vTaskDelay(5000 / portTICK_PERIOD_MS);
                 // moveServo(0); // this throw card forward 0 deg 180 pulls it back
                 // vTaskDelay(5000 / portTICK_PERIOD_MS);

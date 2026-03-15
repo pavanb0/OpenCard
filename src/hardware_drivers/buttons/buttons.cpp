@@ -39,4 +39,44 @@ bool buttonShortPress(ButtonState b)
 {
   Btn &bt = btn[b];
   bool cur = digitalRead(bt.pin);
+
+  if (bt.lastState == HIGH && cur == LOW) {
+    bt.pressedAt = millis();
+    bt.longSent = false;
+  }
+
+  if (bt.lastState == LOW && cur == HIGH) {
+    if (!bt.longSent && (millis() - bt.pressedAt) < LONG_PRESS_MS) {
+      bt.lastState = cur;
+      buzzerClick();
+      return true;
+    }
+  }
+
+  bt.lastState = cur;
+  return false;
+
 }
+
+bool buttonLongPress(ButtonState b) {
+  Btn &bt = btn[b];
+  bool cur = digitalRead(bt.pin);
+
+  if (bt.lastState == HIGH && cur == LOW) {
+    bt.pressedAt = millis();
+    bt.longSent = false;
+  }
+
+  if (cur == LOW && !bt.longSent &&
+      (millis() - bt.pressedAt) >= LONG_PRESS_MS) {
+    bt.longSent = true;
+    buzzerDoubleClick();
+    return true;
+  }
+
+  bt.lastState = cur;
+  return false;
+}
+
+
+

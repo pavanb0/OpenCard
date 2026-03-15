@@ -6,7 +6,8 @@ enum ButtonState {
   STATE_BTN_SELECT,
   STATE_BTN_DOWN
 };
-
+bool buttonShortPress(ButtonState b);
+bool buttonLongPress(ButtonState b);
 void buttonInit();
 // void button_print();
 // void buttonTask(void *pvbuttonParameter);

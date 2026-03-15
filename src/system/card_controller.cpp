@@ -1,155 +1,3 @@
-// #include "Arduino.h"
-// #include <hardware_drivers/ldr/ldr.h>
-// #include <modules/card_throw.h>
-// #include <modules/card_throw_state.h>
-// #include <hardware_drivers/stepper/stepper.h>
-
-// static int player = 4;
-// static int cards_per_player = 5;
-
-// void startGame(int players, int cards_per_player)
-// {
-//     player = players;
-//     cards_per_player = cards_per_player;
-// };
-
-// void gameControllerTask(void *pvArguments)
-// {
-//     for (;;)
-//     {
-//         if (player != 0 && cards_per_player != 0 && getCardThrowState() == STATE_IDLE)
-//         {
-//             if (getCardThrowState() == STATE_CARD_JAMMED)
-//             {
-//                 break;
-//             }
-
-//             for (uint16_t circleCount = 0; circleCount < cards_per_player; circleCount++)
-//             {
-//                 if (getCardThrowState() == STATE_CARD_JAMMED)
-//                 {
-//                     break;
-//                 }
-//                 Serial.println("outer Circle ");
-//                 for (u_int16_t playerRotate = 0; playerRotate < player; playerRotate++)
-//                 {
-//                     setCardThrowState(STATE_RUNNING);
-//                     vTaskDelay(3300 / portTICK_PERIOD_MS);
-//                     if (getCardThrowState() == STATE_CARD_SUCCESS)
-//                     {
-
-//                         stepperMove(360 / player);
-//                         vTaskDelay((200 * (360 / player)) / portTICK_PERIOD_MS);
-//                     }
-//                     else if (getCardThrowState() == STATE_CARD_JAMMED)
-//                     {
-//                         Serial.println("Card Jammed");
-//                         break;
-//                     }
-//                 }
-
-//             }
-
-//         }
-
-//         vTaskDelay(300 / portTICK_PERIOD_MS);
-//     }
-// };
-
-// #include "Arduino.h"
-// #include <hardware_drivers/ldr/ldr.h>
-// #include <modules/card_throw.h>
-// #include <modules/card_throw_state.h>
-// #include <hardware_drivers/stepper/stepper.h>
-
-// static int player = 2;
-// static int cards_per_player = 3;
-
-// void startGame(int players, int cardsPerPlayer)
-// {
-//    // Serial.println("startGame() called");
-//     // Serial.print("Players: ");
-//     // Serial.println(players);
-//     // Serial.print("Cards per player: ");
-//     // Serial.println(cardsPerPlayer);
-
-//     player = players;
-//     cards_per_player = cardsPerPlayer;
-// };
-// bool isFirstTime = true;
-// void gameControllerTask(void *pvArguments)
-// {
-//     Serial.println("Game Controller Task Started");
-
-//     for (;;)
-//     {
-
-// // ------------------------
-
-//         // Serial.println("Controller loop tick");
-
-//         // if (player != 0 && cards_per_player != 0 && getCardThrowState() == STATE_IDLE)
-//         // {
-//         //     Serial.println("Game condition valid. Starting dealing cycle");
-
-//         //     if (getCardThrowState() == STATE_CARD_JAMMED)
-//         //     {
-//         //         Serial.println("Card jam detected before start. Exiting controller.");
-//         //         break;
-//         //     }
-
-//         //     for (uint16_t circleCount = 0; circleCount < cards_per_player; circleCount++)
-//         //     {
-//         //         // Serial.print("Outer circle iteration: ");
-//         //         Serial.println(circleCount);
-
-//         //         if (getCardThrowState() == STATE_CARD_JAMMED)
-//         //         {
-//         //             // Serial.println("Jam detected. Breaking outer loop.");
-//         //             break;
-//         //         }
-
-//         //         // Serial.println("outer Circle ");
-
-//         //         for (u_int16_t playerRotate = 0; playerRotate < player; playerRotate++)
-//         //         {
-//         //             // Serial.print("Dealing to player index: ");
-//         //             Serial.println(playerRotate);
-
-//         //             setCardThrowState(STATE_RUNNING);
-//         //             Serial.println("State set to STATE_RUNNING");
-
-//         //             vTaskDelay(5500 / portTICK_PERIOD_MS); // servo(1000) + ramp(~510) + gantry wait(up to 3000) = ~4500ms, 5500 gives margin
-
-//         //             Serial.print("Card throw state after delay: ");
-//         //             Serial.println(getCardThrowState());
-
-//         //             if (getCardThrowState() == STATE_CARD_SUCCESS)
-//         //             {
-//         //                 Serial.println("Card throw SUCCESS");
-
-//         //                 Serial.print("Stepper rotating degrees: ");
-//         //                 Serial.println(360 / player);
-
-//         //                 stepperMove(360 / player);
-
-//         //                 vTaskDelay((200 * (360 / player)) / portTICK_PERIOD_MS);
-//         //             }
-//         //             else if (getCardThrowState() == STATE_CARD_JAMMED)
-//         //             {
-//         //                 Serial.println("Card Jammed");
-//         //                 break;
-//         //             }
-//         //         }
-//         //     }
-//         // }
-//         // vTaskDelay(300 / portTICK_PERIOD_MS);
-
-//         // ------------------------
-
-//         vTaskDelay(300 / portTICK_PERIOD_MS);
-//     }
-// };
 
 #include "Arduino.h"
 #include <hardware_drivers/ldr/ldr.h>
@@ -158,89 +6,101 @@
 #include <hardware_drivers/stepper/stepper.h>
 #include <modules/card_throw_queue.h>
 #include "card_controller_queue.h"
+#include <ui/ui_menue.h>          
 
 volatile bool isDeckEmpty = false;
+
+static void pushProgress(const CardControllerResponse &r)
+{
+    GameProgress gp;
+    gp.currentPlayer  = r.currentPlayer;
+    gp.currentCard    = r.currentCard;
+    gp.totalPlayers   = r.totalPlayers;
+    gp.cardsPerPlayer = r.cardsPerPlayer;
+    gp.deckEmpty      = r.deckEmpty;
+    gp.jamDetected    = r.jamDetected;
+    gp.finished       = r.finished;
+    menuSetProgress(gp);
+}
 
 void gameControllerTask(void *pvArguments)
 {
     Serial.println("Game Controller Task Started");
+
     for (;;)
     {
-        Serial.println("Game Controller Task loop");
-        CardControllerRequest throwControllerRequest;
-        if (xQueueReceive(cardControllerRequest, &throwControllerRequest, portMAX_DELAY) == pdTRUE)
+        CardControllerRequest req;
+        if (xQueueReceive(cardControllerRequest, &req, portMAX_DELAY) != pdTRUE)
+            continue;
+
+        if (!req.isSendTask)
         {
-            isDeckEmpty = false;
-            int angle = 360 / throwControllerRequest.playerCount;
+            vTaskDelay(100 / portTICK_PERIOD_MS);
+            continue;
+        }
 
-            CardControllerResponse throwCardControllerResponse;
-            for (int rounds = 0; rounds < throwControllerRequest.cardsPerPlayer && !isDeckEmpty && throwControllerRequest.isSendTask; rounds++)
+        isDeckEmpty = false;
+        const int angle = (req.playerCount > 0) ? (360 / req.playerCount) : 0;
+
+        CardControllerResponse resp = {};
+        resp.totalPlayers   = req.playerCount;
+        resp.cardsPerPlayer = req.cardsPerPlayer;
+
+        for (int round = 0; round < req.cardsPerPlayer && !isDeckEmpty; round++)
+        {
+            resp.currentCard = round + 1;
+
+            for (int p = 0; p < req.playerCount && !isDeckEmpty; p++)
             {
-                throwCardControllerResponse.currentCard = rounds + 1;
+                resp.currentPlayer  = p + 1;
+                resp.deckEmpty      = false;
+                resp.jamDetected    = false;
+                resp.finished       = false;
 
-                for (int p = 0; p < throwControllerRequest.playerCount && !isDeckEmpty; p++)
+                pushProgress(resp);
+                xQueueSend(cardControllerResponse, &resp, 0);
+
+                ThrowCommand cmd = CMD_CARD_THROW;
+                xQueueSend(throwCommandQueue, &cmd, portMAX_DELAY);
+
+                ThrowResult result;
+                if (xQueueReceive(throwResultQueue, &result, portMAX_DELAY) != pdTRUE)
+                    continue;
+
+                switch (result)
                 {
-                    throwCardControllerResponse.currentPlayer = p + 1;
+                case RESULT_SUCCESS:
+                    Serial.println("Card thrown OK");
+                    stepperMove(angle);
+                    break;
 
-                    ThrowCommand command = CMD_CARD_THROW;
-                    xQueueSend(throwCommandQueue, &command, portMAX_DELAY);
-                    ThrowResult result;
-                    if (xQueueReceive(throwResultQueue, &result, portMAX_DELAY))
-                    {
-                        // Serial.println(uxQueueMessagesWaiting(throwResultQueue));
+                case RESULT_EMPTY:
+                    Serial.println("Deck empty");
+                    isDeckEmpty        = true;
+                    resp.deckEmpty     = true;
+                    pushProgress(resp);
+                    xQueueSend(cardControllerResponse, &resp, 0);
+                    break;
 
-                        throwCardControllerResponse.totalPlayers = throwControllerRequest.playerCount;
-                        throwCardControllerResponse.cardsPerPlayer = throwControllerRequest.cardsPerPlayer;
-                        throwCardControllerResponse.deckEmpty = false;
-                        throwCardControllerResponse.jamDetected = false;
-                        throwCardControllerResponse.finished = false;
-                        switch (result)
-                        {
-                        
-                            case RESULT_SUCCESS:
-                        {
+                case RESULT_JAM:
+                    Serial.println("Card JAMMED");
+                    resp.jamDetected   = true;
+                    pushProgress(resp);
+                    xQueueSend(cardControllerResponse, &resp, 0);
+                    for (;;) vTaskDelay(1000 / portTICK_PERIOD_MS);
+                    break;
 
-                            Serial.println("one card throwed succesfully");
-                            stepperMove(angle);
-                            break;
-                        }
-                        case RESULT_EMPTY:
-                        {
-                            throwCardControllerResponse.deckEmpty = true;
-
-                            /* code */
-                            isDeckEmpty = true;
-                            Serial.println("Stack is empty");
-
-                            break;
-                        }
-                        case RESULT_JAM:
-                        {
-                            throwCardControllerResponse.jamDetected = true;
-                            xQueueSend(cardControllerResponse, &throwCardControllerResponse, portMAX_DELAY);
-
-                            /* code */
-                            while (true)
-                            {
-                                vTaskDelay(1000 / portTICK_PERIOD_MS);
-                                Serial.println("controller HALTED Card jammed");
-                            } // TODO later will add in menue to handle this
-                            break;
-                        }
-
-                        default:
-                        {
-                            break;
-                        }
-                        }
-                        xQueueSend(cardControllerResponse, &throwCardControllerResponse, portMAX_DELAY);
-                    }
+                default:
+                    break;
                 }
             }
-            throwCardControllerResponse.finished = true;
-            xQueueSend(cardControllerResponse, &throwCardControllerResponse, portMAX_DELAY);
         }
+
+        resp.finished = true;
+        pushProgress(resp);
+        xQueueSend(cardControllerResponse, &resp, 0);
 
         vTaskDelay(300 / portTICK_PERIOD_MS);
     }
-};
+}
+
